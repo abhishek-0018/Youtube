@@ -2,7 +2,6 @@ import ReactDOM from "react-dom/client";
 import React from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import App from './App.jsx'
-import Header from './Header.jsx'
 import Landingpage from "./landingPage.jsx";
 
 const AppLayout = () => {
@@ -23,6 +22,14 @@ const appRouter = createBrowserRouter([
         element: (
           <>
           <Landingpage/>
+          </>
+        ),
+      },
+      {
+        path: "/user",
+        element: (
+          <>
+          <App/>
           </>
         ),
       },
