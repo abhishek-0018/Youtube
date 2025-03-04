@@ -4,34 +4,61 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Landingpage = () => {
-    const [action, setAction] = useState("Sign Up");
+    const [action, setAction] = useState("Login");
     const [email, setEmail] = useState("");
     const [fullName, setFullName] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
+    const [avatar, setavatar] =useState(null);
+    const [coverImage, setCoverImage] =useState(null);
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const handleFileChange=(e)=>{
+        const file=e.target.files[0];
+        if(file){
+            setCoverImage(file);
+        }
+    }
 
-        const userData = {
-            email,
-            username,
-            password,
-            ...(action === "Sign Up" && { fullName })
-        };
+    const handleFileCh=(e)=>{
+        const file=e.target.files[0];
+        if(file){
+            setavatar(file);
+        }
+    }
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        if (!email || !username || !password) {
+            alert("No data collected");
+            return;
+        }
+    
+        const userData = new FormData();
+        userData.append("email", email);
+        userData.append("username", username);
+        userData.append("password", password);
+    
+        if (action === "Sign Up") {
+            userData.append("fullName", fullName);
+            if (avatar) userData.append("avatar", avatar); // Ensure file exists
+            if (coverImage) userData.append("coverImage", coverImage);
+        }
+    
+        const headers = action === "Sign Up"
+    ? { "Content-Type": "multipart/form-data" }
+    : { "Content-Type": "application/json" };
         try {
             const endpoint = action === "Sign Up" ? "/api/v1/users/register" : "/api/v1/users/login";
-            const response = await axios.post(`http://localhost:8000${endpoint}`, userData);
-
-            console.log(response.data);
+            const response = await axios.post(`http://localhost:8000${endpoint}`, userData, {headers});
+    
             alert(`${action} Successful!`);
-
-            if (action === "Login" && response.data.success) {
+    
+            if (response.data.success) {
                 localStorage.setItem("userData", JSON.stringify(response.data.data.user));
-                localStorage.setItem("accessToken", response.data.data.token);
+                localStorage.setItem("accessToken", response.data.data.accessToken);
                 navigate("/user");
             }
         } catch (error) {
@@ -39,6 +66,7 @@ const Landingpage = () => {
             alert(error.response?.data?.message || "Error during authentication");
         }
     };
+    
 
     return (
         <div className="flex absolute z-10 flex-col mx-auto mt-[100px] ml-[450px] w-[600px] bg-white/30 pb-[30px]">
@@ -48,6 +76,7 @@ const Landingpage = () => {
             <form onSubmit={handleSubmit} className="mt-[55px] flex flex-col items-center justify-center gap-[25px]">
                 {action === "Sign Up" && (
                     <div className="flex items-center justify-center w-[480px] h-[80px] bg-gray-200 rounded-md">
+                        <div>
                         <input
                             placeholder="Full Name"
                             type="text"
@@ -56,8 +85,40 @@ const Landingpage = () => {
                             className="p-3 w-full bg-transparent outline-none"
                             autoComplete="off"
                         />
+                        </div>
                     </div>
                 )}
+
+                {action === "Sign Up" && (
+                    <div className="flex items-center justify-center w-[480px] h-[80px] bg-gray-200 rounded-md">
+                        <label>Avatar</label>
+                        <div>
+                    <input
+                   placeholder="Avatar"
+                   type="file"
+                   onChange={handleFileCh}
+                   className="p-3 w-full bg-transparent outline-none"
+                   autoComplete="off"
+               />
+                </div>
+                </div>
+                )}
+                {action === "Sign Up" && (
+                    <div className="flex items-center justify-center w-[480px] h-[80px] bg-gray-200 rounded-md">
+                        <label>Cover Image</label>
+                        <div>
+
+                    <input
+                   placeholder="Cover Image"
+                   type="file"
+                   onChange={handleFileChange}
+                   className="p-3 w-full bg-transparent outline-none"
+                   autoComplete="off"
+               />
+                </div>
+                </div>
+                )}
+
                 <div className="flex items-center justify-center w-[480px] h-[80px] bg-gray-200 rounded-md">
                     <input
                         placeholder="Username"
@@ -126,4 +187,3 @@ const Landingpage = () => {
 };
 
 export default Landingpage;
-

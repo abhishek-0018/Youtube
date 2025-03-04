@@ -2,7 +2,9 @@ import ReactDOM from "react-dom/client";
 import React from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import App from './App.jsx'
-import Landingpage from "./landingPage.jsx";
+import Landingpage from "./Landingpage.jsx";
+import Header from "./Header.jsx";
+import VideoUpload from "./videoUpload.jsx";
 
 const AppLayout = () => {
   return (
@@ -15,7 +17,7 @@ const AppLayout = () => {
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: [<AppLayout />],
+    element: <AppLayout />,
     children: [
       {
         path: "/",
@@ -29,7 +31,15 @@ const appRouter = createBrowserRouter([
         path: "/user",
         element: (
           <>
-          <App/>
+          <Header/>,<App/>
+          </>
+        ),
+      },
+      {
+        path: "/videoUpload",
+        element: (
+          <>
+          <VideoUpload/>
           </>
         ),
       },
