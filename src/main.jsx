@@ -5,6 +5,7 @@ import App from './App.jsx'
 import Landingpage from "./Landingpage.jsx";
 import Header from "./Header.jsx";
 import VideoUpload from "./videoUpload.jsx";
+import SearchedUser from "./searchedUser.jsx";
 
 const AppLayout = () => {
   return (
@@ -40,6 +41,14 @@ const appRouter = createBrowserRouter([
         element: (
           <>
           <VideoUpload/>
+          </>
+        ),
+      },
+      {
+        path: "/searchedUser",
+        element: (
+          <>
+          <Header/>,<SearchedUser/>
           </>
         ),
       },

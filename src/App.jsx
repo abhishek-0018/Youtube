@@ -6,6 +6,7 @@ import axios from "axios";
 const App = () => {
     const [user, setUser] = useState(null);
     const [listOfVideos,setListOfVideos]=useState([]);
+    const [searchedUser,setSearchedUser]=useState("");
     const navigate = useNavigate();
     const fetchData=async()=>{
         const access=localStorage.getItem("accessToken");
@@ -14,6 +15,16 @@ const App = () => {
         }});
         setListOfVideos(data.data.data);
     }
+    const fetchUser=async()=>{
+        const access = localStorage.getItem("accessToken");
+        const user = await axios.get(`http://localhost:8000/api/v1/users/getUser`, {
+            params: { "searchedUser":searchedUser },
+            headers: { Authorization: `Bearer ${access}` },
+        });
+        localStorage.setItem("searchedUser", JSON.stringify(user.data.data.user));
+        navigate("/searchedUser")
+    }
+
     useEffect(() => {
       const storedUser = localStorage.getItem("userData");
       if (!storedUser) {
@@ -42,27 +53,35 @@ const App = () => {
 
     return (
         <div className="flex flex-col">
+            <div className="flex items-center justify-center">
+                <div className="mx-2 px-2">
+                    <input type="text" placeholder="Enter User name" className="border border-solid border-black" value={searchedUser} onChange={(e)=>{
+                        setSearchedUser(e.target.value);
+                    }}></input>
+                    
+                    <button className="px-4 py-2 bg-red-300 sm:bg-green-300 lg:bg-gray-300 m-4 rounded-lg" onClick={fetchUser}>Search</button>
+                </div>
+                </div>
           <img src={user.coverImage} className="static h-[400px] w-[80%] ml-40"></img>
-          <div className="flex">
-          <img src={user.avatar} className="rounded-[50%] ml-50 mt-20 lg:h-[250px] lg:w-[250px] sm:h-[100px] sm:w-[100px]"></img>
-          <div className="ml-[80px] flex flex-col justify-center items-center">
+          <div className="flex justify-center">
+          <img src={user.avatar} className="rounded-[50%] mt-20 lg:h-[250px] lg:w-[250px] sm:h-[100px] sm:w-[100px]"></img>
+          </div>
+          <div className="flex flex-col justify-center items-center">
           <h1 className="text-3xl font-bold">Welcome, {user.username}!</h1>
             <p>Email: {user.email}</p>
             <p>Full Name: {user.fullName ? user.fullName : "N/A"}</p>
           </div>
-          </div>
-          <div className="flex items-center mt-[50px]">
+          <div className="flex items-center mt-[100px]">
               <h1 className="text-5xl ml-[120px] mr-[50px]">Videos</h1>
               <button className=" bg-red-500 text-white px-4 py-2 rounded w-50 h-10"
                 onClick={getvideouploadpage}>Upload More</button>
           </div>
-              <div className="flex flex-wrap ml-[100px]">
-                {
-                    listOfVideos.map((res) => (
-                        <UploadedVideos key={res._id} resData={res} />
-                    ))
-                }
-            </div>
+          {listOfVideos.length > 0 ? (
+                listOfVideos.map((video) => (
+                    <UploadedVideos key={video._id} resData={video} />
+                ))) : (
+                    <p className="text-center">No videos uploaded yet.</p>
+                )}
         </div>
     );
 };
